@@ -5,6 +5,7 @@ import os
 
 import botocore
 import botocore.session
+from azure.storage.queue import QueueService
 from pywren import local
 
 SOURCE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +39,19 @@ class LambdaInvoker(object):
         return {'lambda_function_name' : self.lambda_function_name,
                 'region_name' : self.region_name}
 
+class AzureInvoker(object):
+    def __init__(self, config, queue_name):
+
+        self.queue_service = QueueService(account_name = config["account"], account_key = config["key"])
+        self.queue = queue_name
+        self.TIME_LIMIT = True
+
+    def invoke(self, payload):
+        self.queue_service.put_message(self.queue, str(payload))
+        return {}
+
+    def config(self):
+        return {"function_name" : self.queue}
 
 class DummyInvoker(object):
     """
