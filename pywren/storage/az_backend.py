@@ -1,3 +1,5 @@
+from azure.storage.blob import BlockBlobService
+
 from .exceptions import StorageNoSuchKeyError
 
 class AZBackend(object):
@@ -6,7 +8,12 @@ class AZBackend(object):
     """
 
     def __init__(self, config):
+
         self.container = config["container"]
+        self.block_blob_service = BlockBlobService(
+            account_name=config["account"],
+            account_key=config["key"]
+        )
         
     def put_object(self, key, data):
         """
@@ -17,7 +24,11 @@ class AZBackend(object):
         :type data: str/bytes
         :return: None
         """
-        pass
+        self.block_blob_service.create_blob_from_bytes(
+            container_name = self.container,
+            blob_name = key,
+            blob = data
+        )
 
 
     def get_object(self, key):
@@ -28,7 +39,10 @@ class AZBackend(object):
         :return: Data of the object
         :rtype: str/bytes
         """
-        pass
+        try:
+            r = self.block_blob_service.get
+        except azure.common.AzureMissingResourceHttpError as e:
+            raise StorageNoSuchKeyError(key)
 
     def key_exists(self, key):
         """
@@ -37,13 +51,17 @@ class AZBackend(object):
         :return: True if key exists, False if not exists
         :rtype: boolean
         """
-        pass
+        return self.block_blob_service.exists(self.container, key)
 
-    def list_keys_with_prefix(self, prefix):
+    def list_keys_with_prefix(self, pref):
         """
         Return a list of keys for the given prefix.
         :param key: key of the object
         :return: True if key exists, False if not exists
         :rtype: A list of keys
         """
-        pass
+        paginator = self.block_blob_service.list_blobs(
+            container = self.container,
+            prefix = pref
+        )
+
