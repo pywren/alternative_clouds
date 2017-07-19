@@ -1,0 +1,40 @@
+{
+  "bindings": [
+    {
+      "name": "queueMessage",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "samples-python",
+      "connection": "AzureWebJobsDashboard"
+    },
+    {
+      "type": "blob",
+      "name": "status_file",
+      "path": "azure-webjobs-hosts/foo/{status_key}",
+      "connection": "AzureWebJobsDashboard",
+      "direction": "out"
+    },
+    {
+      "type": "blob",
+      "name": "output_file",
+      "path": "azure-webjobs-hosts/foo/{output_key}",
+      "connection": "AzureWebJobsDashboard",
+      "direction": "out"
+    },
+    {
+      "type": "blob",
+      "name": "data_file",
+      "path": "azure-webjobs-hosts/foo/{data_key}",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    },
+    {
+      "type": "blob",
+      "name": "func_file",
+      "path": "azure-webjobs-hosts/foo/{func_key}",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    }
+  ],
+  "disabled": false
+}

@@ -67,11 +67,7 @@ t
         logger.info("invocation started")
 
         # download the input
-        status_key = event['status_key']
-        func_key = event['func_key']
-        data_key = event['data_key']
         data_byte_range = event['data_byte_range']
-        output_key = event['output_key']
 
         if version.__version__ != event['pywren_version']:
             raise Exception("WRONGVERSION", "Pywren version mismatch",
@@ -207,7 +203,7 @@ t
         response_status['exception_args'] = e.args
         response_status['exception_traceback'] = traceback.format_exc()
     finally:
-        status_file = open(os.environ["status_key"], 'w')
+        status_file = open(os.environ["status_file"], 'w')
         status_file.write(json.dumps(response_status))
         status_file.close()
 
