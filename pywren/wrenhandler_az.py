@@ -21,6 +21,8 @@ else:
     import wrenutil
     import version
 
+TEMP = "D:\local\Temp"
+
 PYTHON_MODULE_PATH = "/tmp/pymodules"
 CONDA_RUNTIME_DIR = "/tmp/condaruntime"
 RUNTIME_LOC = "/tmp/runtimes"
@@ -29,24 +31,14 @@ logger = logging.getLogger(__name__)
 
 PROCESS_STDOUT_SLEEP_SECS = 2
 
-def get_key_size(s3client, bucket, key):
-    try:
-        a = s3client.head_object(Bucket=bucket, Key=key)
-        return a['ContentLength']
-    except botocore.exceptions.ClientError as e:
-        if e.response['Error']['Code'] == "404":
-            return None
-        else:
-            raise e
-
-def download_runtime_if_necessary(s3_client, runtime_s3_bucket, runtime_s3_key):
+def download_runtime_if_necessary(azclient, runtime_s3_bucket, runtime_s3_key):
     """
     Download the runtime if necessary
 
     return True if cached, False if not (download occured)
 
     """
-
+    return True
     # get runtime etag
     runtime_meta = s3_client.head_object(Bucket=runtime_s3_bucket,
                                          Key=runtime_s3_key)
@@ -98,25 +90,35 @@ def b64str_to_bytes(str_data):
     return byte_data
 
 
-def aws_lambda_handler(event, context):
-    logger.setLevel(logging.INFO)
-    context_dict = {
-        'aws_request_id' : context.aws_request_id,
-        'log_group_name' : context.log_group_name,
-        'log_stream_name' : context.log_stream_name,
-    }
+#def aws_lambda_handler(event, context):
+#    logger.setLevel(logging.INFO)
+#    context_dict = {
+#        'aws_request_id' : context.aws_request_id,
+#        'log_group_name' : context.log_group_name,
+#        'log_stream_name' : context.log_stream_name,
+#    }
+#    return generic_handler(event, context_dict)
+
+def az_handler(event, context):
+    logger.setlevel(logging.INFO)
+    context_dict = {}
     return generic_handler(event, context_dict)
 
+#def get_server_info():
+#    return {} # FIXME later
+#    server_info = {'uname' : subprocess.check_output("uname -a", shell=True).decode("ascii")}
+#    if os.path.exists("/proc"):
+#        server_info.update({'/proc/cpuinfo': open("/proc/cpuinfo", 'r').read(),
+#                            '/proc/meminfo': open("/proc/meminfo", 'r').read(),
+#                            '/proc/self/cgroup': open("/proc/meminfo", 'r').read(),
+#                            '/proc/cgroups': open("/proc/cgroups", 'r').read()})
+#
+#    return server_info
+
 def get_server_info():
-
-    server_info = {'uname' : subprocess.check_output("uname -a", shell=True).decode("ascii")}
-    if os.path.exists("/proc"):
-        server_info.update({'/proc/cpuinfo': open("/proc/cpuinfo", 'r').read(),
-                            '/proc/meminfo': open("/proc/meminfo", 'r').read(),
-                            '/proc/self/cgroup': open("/proc/meminfo", 'r').read(),
-                            '/proc/cgroups': open("/proc/cgroups", 'r').read()})
-
-
+    server_info = {'uname': ' '.join(os.uname())}
+    if False:
+        pass
     return server_info
 
 def generic_handler(event, context_dict):
@@ -127,12 +129,11 @@ def generic_handler(event, context_dict):
 
     response_status = {'exception': None}
     try:
-        if event['storage_config']['storage_backend'] != 's3':
+        if event['storage_config']['storage_backend'] != 'az':
             raise NotImplementedError(("Using {} as storage backend is not supported " +
+t
                                        "yet.").format(event['storage_config']['storage_backend']))
-        s3_client = boto3.client("s3")
-        s3_transfer = boto3.s3.transfer.S3Transfer(s3_client)
-        s3_bucket = event['storage_config']['backend_config']['bucket']
+        bucket = event['storage_config']['backend_config']['bucket']
 
         logger.info("invocation started")
 
@@ -150,58 +151,48 @@ def generic_handler(event, context_dict):
         start_time = time.time()
         response_status['start_time'] = start_time
 
-        func_filename = "/tmp/func.pickle"
-        data_filename = "/tmp/data.pickle"
-        output_filename = "/tmp/output.pickle"
+        func_filename = os.environ["func_file"]
+        data_file = os.environ["data_file"]
+        output_filename = os.environ["output_file"]
 
-        runtime_s3_bucket = event['runtime']['s3_bucket']
-        runtime_s3_key = event['runtime']['s3_key']
-        if event.get('runtime_url'):
-            # NOTE(shivaram): Right now we only support S3 urls.
-            runtime_s3_bucket_used, runtime_s3_key_used = wrenutil.split_s3_url(
-                event['runtime_url'])
-        else:
-            runtime_s3_bucket_used = runtime_s3_bucket
-            runtime_s3_key_used = runtime_s3_key
-
-        job_max_runtime = event.get("job_max_runtime", 290) # default for lambda
-
-        response_status['func_key'] = func_key
-        response_status['data_key'] = data_key
-        response_status['output_key'] = output_key
-        response_status['status_key'] = status_key
-
-        KS = get_key_size(s3_client, s3_bucket, data_key)
-        #logger.info("bucket=", s3_bucket, "key=", data_key,  "status: ", KS, "bytes" )
-        while KS is None:
-            logger.warn("WARNING COULD NOT GET FIRST KEY")
-
-            KS = get_key_size(s3_client, s3_bucket, data_key)
-        if not event['use_cached_runtime']:
-            subprocess.check_output("rm -Rf {}/*".format(RUNTIME_LOC), shell=True)
+#        runtime_s3_bucket = event['runtime']['s3_bucket']
+#        runtime_s3_key = event['runtime']['s3_key']
+#        if event.get('runtime_url'):
+#            # NOTE(shivaram): Right now we only support S3 urls.
+#            runtime_s3_bucket_used, runtime_s3_key_used = wrenutil.split_s3_url(
+#                event['runtime_url'])
+#        else:
+#            runtime_s3_bucket_used = runtime_s3_bucket
+#            runtime_s3_key_used = runtime_s3_key
+#
+#        job_max_runtime = event.get("job_max_runtime", 290) # default for lambda
+#
+#        response_status['func_key'] = func_key
+#        response_status['data_key'] = data_key
+#        response_status['output_key'] = output_key
+#        response_status['status_key'] = status_key
+#
+#        if not event['use_cached_runtime']:
+#            subprocess.check_output("rm -Rf {}/*".format(RUNTIME_LOC), shell=True)
 
 
         # get the input and save to disk
         # FIXME here is we where we would attach the "canceled" metadata
-        s3_transfer.download_file(s3_bucket, func_key, func_filename)
-        func_download_time = time.time() - start_time
-        response_status['func_download_time'] = func_download_time
+#        func_download_time = time.time() - start_time
+#        response_status['func_download_time'] = func_download_time.
 
-        logger.info("func download complete, took {:3.2f} sec".format(func_download_time))
+      #download times don't make sense on azure since everything's preloaded.
+
+ #       logger.info("func download complete, took {:3.2f} sec".format(func_download_time))
 
         if data_byte_range is None:
-            s3_transfer.download_file(s3_bucket, data_key, data_filename)
+            s3_transfer.download_file(bucket, data_key, data_filename)
         else:
-            range_str = 'bytes={}-{}'.format(*data_byte_range)
-            dres = s3_client.get_object(Bucket=s3_bucket, Key=data_key,
-                                        Range=range_str)
-            data_fid = open(data_filename, 'wb')
-            data_fid.write(dres['Body'].read())
-            data_fid.close()
+            raise NotImplementedError("Using data range not supported yet")
 
-        data_download_time = time.time() - start_time
-        logger.info("data data download complete, took {:3.2f} sec".format(data_download_time))
-        response_status['data_download_time'] = data_download_time
+#        data_download_time = time.time() - start_time
+#        logger.info("data data download complete, took {:3.2f} sec".format(data_download_time))
+#        response_status['data_download_time'] = data_download_time
 
         # now split
         d = json.load(open(func_filename, 'r'))
@@ -334,12 +325,4 @@ def generic_handler(event, context_dict):
 
 
 if __name__ == "__main__":
-    s3 = boto3.resource('s3')
-    # s3.meta.client.download_file('ericmjonas-public', 'condaruntime.tar.gz',
-    #                              '/tmp/condaruntime.tar.gz')
-    res = s3.meta.client.get_object(Bucket='ericmjonas-public', Key='condaruntime.tar.gz')
 
-    condatar = tarfile.open(
-        mode="r:gz",
-        fileobj=wrenutil.WrappedStreamingBody(res['Body'], res['ContentLength']))
-    condatar.extractall('/tmp/test1/')
