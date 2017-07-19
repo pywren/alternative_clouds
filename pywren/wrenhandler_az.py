@@ -24,8 +24,6 @@ else:
 TEMP = "D:\local\Temp"
 
 PYTHON_MODULE_PATH = "/tmp/pymodules"
-CONDA_RUNTIME_DIR = "/tmp/condaruntime"
-RUNTIME_LOC = "/tmp/runtimes"
 
 logger = logging.getLogger(__name__)
 
@@ -36,53 +34,9 @@ def download_runtime_if_necessary(azclient, runtime_s3_bucket, runtime_s3_key):
     Download the runtime if necessary
 
     return True if cached, False if not (download occured)
-
     """
+    # figure this out later. 
     return True
-    # get runtime etag
-    runtime_meta = s3_client.head_object(Bucket=runtime_s3_bucket,
-                                         Key=runtime_s3_key)
-    # etags have strings (double quotes) on each end, so we strip those
-    ETag = str(runtime_meta['ETag'])[1:-1]
-    logger.debug("The etag is ={}".format(ETag))
-    runtime_etag_dir = os.path.join(RUNTIME_LOC, ETag)
-    logger.debug("Runtime etag dir={}".format(runtime_etag_dir))
-    expected_target = os.path.join(runtime_etag_dir, 'condaruntime')
-    logger.debug("Expected target={}".format(expected_target))
-    # check if dir is linked to correct runtime
-    if os.path.exists(RUNTIME_LOC):
-        if os.path.exists(CONDA_RUNTIME_DIR):
-            if not os.path.islink(CONDA_RUNTIME_DIR):
-                raise Exception("{} is not a symbolic link, your runtime config is broken".format(
-                    CONDA_RUNTIME_DIR))
-
-            existing_link = os.readlink(CONDA_RUNTIME_DIR)
-            if existing_link == expected_target:
-                logger.debug("found existing {}, not re-downloading".format(ETag))
-                return True
-
-    logger.debug("{} not cached, downloading".format(ETag))
-    # didn't cache, so we start over
-    if os.path.islink(CONDA_RUNTIME_DIR):
-        os.unlink(CONDA_RUNTIME_DIR)
-
-    shutil.rmtree(RUNTIME_LOC, True)
-
-    os.makedirs(runtime_etag_dir)
-
-    res = s3_client.get_object(Bucket=runtime_s3_bucket,
-                               Key=runtime_s3_key)
-
-    condatar = tarfile.open(
-        mode="r:gz",
-        fileobj=wrenutil.WrappedStreamingBody(res['Body'], res['ContentLength']))
-
-    condatar.extractall(runtime_etag_dir)
-
-    # final operation
-    os.symlink(expected_target, CONDA_RUNTIME_DIR)
-    return False
-
 
 def b64str_to_bytes(str_data):
     str_ascii = str_data.encode('ascii')
@@ -91,13 +45,10 @@ def b64str_to_bytes(str_data):
 
 def az_handler(event, context):
     logger.setlevel(logging.INFO)
-    context_dict = {}
-    return generic_handler(event, context_dict)
+    return generic_handler(event, context)
 
 def get_server_info():
     server_info = {'uname': ' '.join(os.uname())}
-    if False:
-        pass
     return server_info
 
 def generic_handler(event, context_dict):
@@ -105,7 +56,6 @@ def generic_handler(event, context_dict):
     context_dict is generic infromation about the context
     that we are running in, provided by the scheduler
     """
-
     response_status = {'exception': None}
     try:
         if event['storage_config']['storage_backend'] != 'az':
@@ -120,7 +70,7 @@ t
         status_key = event['status_key']
         func_key = event['func_key']
         data_key = event['data_key']
-#        data_byte_range = event['data_byte_range']
+        data_byte_range = event['data_byte_range']
         output_key = event['output_key']
 
         if version.__version__ != event['pywren_version']:
@@ -131,14 +81,13 @@ t
         response_status['start_time'] = start_time
 
         func_filename = os.environ["func_file"]
-        data_file = os.environ["data_file"]
+        data_filename = os.environ["data_file"]
         output_filename = os.environ["output_file"]
 
-      #download times don't make sense on azure since everything's preloaded.
+        # download times don't make sense on azure since everything's preloaded.
 
         if not (data_byte_range is None):
             raise NotImplementedError("Using data range not supported yet")
-
 
         # now split
         d = json.load(open(func_filename, 'r'))
@@ -187,7 +136,7 @@ t
         response_status['call_id'] = call_id
         response_status['callset_id'] = callset_id
 
-        CONDA_PYTHON_PATH = "/tmp/condaruntime/bin"
+        CONDA_PYTHON_PATH = "D:\home\site\wwwroot\conda\Miniconda2"
         CONDA_PYTHON_RUNTIME = os.path.join(CONDA_PYTHON_PATH, "python")
 
         cmdstr = "{} {} {} {} {}".format(CONDA_PYTHON_RUNTIME,
