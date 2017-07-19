@@ -89,31 +89,10 @@ def b64str_to_bytes(str_data):
     byte_data = base64.b64decode(str_ascii)
     return byte_data
 
-
-#def aws_lambda_handler(event, context):
-#    logger.setLevel(logging.INFO)
-#    context_dict = {
-#        'aws_request_id' : context.aws_request_id,
-#        'log_group_name' : context.log_group_name,
-#        'log_stream_name' : context.log_stream_name,
-#    }
-#    return generic_handler(event, context_dict)
-
 def az_handler(event, context):
     logger.setlevel(logging.INFO)
     context_dict = {}
     return generic_handler(event, context_dict)
-
-#def get_server_info():
-#    return {} # FIXME later
-#    server_info = {'uname' : subprocess.check_output("uname -a", shell=True).decode("ascii")}
-#    if os.path.exists("/proc"):
-#        server_info.update({'/proc/cpuinfo': open("/proc/cpuinfo", 'r').read(),
-#                            '/proc/meminfo': open("/proc/meminfo", 'r').read(),
-#                            '/proc/self/cgroup': open("/proc/meminfo", 'r').read(),
-#                            '/proc/cgroups': open("/proc/cgroups", 'r').read()})
-#
-#    return server_info
 
 def get_server_info():
     server_info = {'uname': ' '.join(os.uname())}
@@ -141,7 +120,7 @@ t
         status_key = event['status_key']
         func_key = event['func_key']
         data_key = event['data_key']
-        data_byte_range = event['data_byte_range']
+#        data_byte_range = event['data_byte_range']
         output_key = event['output_key']
 
         if version.__version__ != event['pywren_version']:
@@ -155,44 +134,11 @@ t
         data_file = os.environ["data_file"]
         output_filename = os.environ["output_file"]
 
-#        runtime_s3_bucket = event['runtime']['s3_bucket']
-#        runtime_s3_key = event['runtime']['s3_key']
-#        if event.get('runtime_url'):
-#            # NOTE(shivaram): Right now we only support S3 urls.
-#            runtime_s3_bucket_used, runtime_s3_key_used = wrenutil.split_s3_url(
-#                event['runtime_url'])
-#        else:
-#            runtime_s3_bucket_used = runtime_s3_bucket
-#            runtime_s3_key_used = runtime_s3_key
-#
-#        job_max_runtime = event.get("job_max_runtime", 290) # default for lambda
-#
-#        response_status['func_key'] = func_key
-#        response_status['data_key'] = data_key
-#        response_status['output_key'] = output_key
-#        response_status['status_key'] = status_key
-#
-#        if not event['use_cached_runtime']:
-#            subprocess.check_output("rm -Rf {}/*".format(RUNTIME_LOC), shell=True)
-
-
-        # get the input and save to disk
-        # FIXME here is we where we would attach the "canceled" metadata
-#        func_download_time = time.time() - start_time
-#        response_status['func_download_time'] = func_download_time.
-
       #download times don't make sense on azure since everything's preloaded.
 
- #       logger.info("func download complete, took {:3.2f} sec".format(func_download_time))
-
-        if data_byte_range is None:
-            s3_transfer.download_file(bucket, data_key, data_filename)
-        else:
+        if not (data_byte_range is None):
             raise NotImplementedError("Using data range not supported yet")
 
-#        data_download_time = time.time() - start_time
-#        logger.info("data data download complete, took {:3.2f} sec".format(data_download_time))
-#        response_status['data_download_time'] = data_download_time
 
         # now split
         d = json.load(open(func_filename, 'r'))
@@ -297,18 +243,11 @@ t
 
         logger.info("command execution finished")
 
-        s3_transfer.upload_file(output_filename, s3_bucket,
-                                output_key)
-        logger.debug("output uploaded to %s %s", s3_bucket, output_key)
-
         end_time = time.time()
 
         response_status['stdout'] = stdout.decode("ascii")
-
-
         response_status['exec_time'] = time.time() - setup_time
         response_status['end_time'] = end_time
-
         response_status['host_submit_time'] = event['host_submit_time']
         response_status['server_info'] = get_server_info()
 
@@ -319,10 +258,11 @@ t
         response_status['exception_args'] = e.args
         response_status['exception_traceback'] = traceback.format_exc()
     finally:
-        # creating new client in case the client has not been created
-        boto3.client("s3").put_object(Bucket=s3_bucket, Key=status_key,
-                                      Body=json.dumps(response_status))
-
+        status_file = open(os.environ["status_key"], 'w')
+        status_file.write(json.dumps(response_status))
+        status_file.close()
 
 if __name__ == "__main__":
+    event_file = open(os.environ["queueMessage"])
+    az_handler(json.load(event_file), {})
 
