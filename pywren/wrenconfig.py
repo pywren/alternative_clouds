@@ -85,6 +85,9 @@ def extract_storage_config(config):
         storage_config['backend_config'] = {}
         storage_config['backend_config']['bucket'] = config['s3']['bucket']
         storage_config['backend_config']['region'] = config['account']['aws_region']
+    elif storage_config['storage_backend'] == 'az':
+        storage_config['backend_config'] = {}
+        storage_config['backend_config']['container'] = config['az']['container']
     return storage_config
 
 basic_role_policy = {

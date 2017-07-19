@@ -13,29 +13,25 @@ from threading import Thread
 
 if sys.version_info > (3, 0):
     from queue import Queue, Empty
-    from . import wrenutil
     from . import version
 
 else:
     from Queue import Queue, Empty
-    import wrenutil
     import version
 
 TEMP = "D:\local\Temp"
-
-PYTHON_MODULE_PATH = "/tmp/pymodules"
+PYTHON_MODULE_PATH = os.path.join(TEMP, "modules")
 
 logger = logging.getLogger(__name__)
 
 PROCESS_STDOUT_SLEEP_SECS = 2
 
-def download_runtime_if_necessary(azclient, runtime_s3_bucket, runtime_s3_key):
+def download_runtime_if_necessary(azclient, runtime_bucket, runtime_key):
     """
     Download the runtime if necessary
-
     return True if cached, False if not (download occured)
     """
-    # figure this out later. 
+    # figure this out later.
     return True
 
 def b64str_to_bytes(str_data):
@@ -60,18 +56,17 @@ def generic_handler(event, context_dict):
     try:
         if event['storage_config']['storage_backend'] != 'az':
             raise NotImplementedError(("Using {} as storage backend is not supported " +
-t
                                        "yet.").format(event['storage_config']['storage_backend']))
-        bucket = event['storage_config']['backend_config']['bucket']
+        bucket = event['storage_config']['backend_config']['container']
 
         logger.info("invocation started")
 
         # download the input
         data_byte_range = event['data_byte_range']
 
-        if version.__version__ != event['pywren_version']:
-            raise Exception("WRONGVERSION", "Pywren version mismatch",
-                            version.__version__, event['pywren_version'])
+#        if version.__version__ != event['pywren_version']:
+#            raise Exception("WRONGVERSION", "Pywren version mismatch",
+#                            version.__version__, event['pywren_version'])
 
         start_time = time.time()
         response_status['start_time'] = start_time
@@ -82,7 +77,7 @@ t
 
         # download times don't make sense on azure since everything's preloaded.
 
-        if not (data_byte_range is None):
+        if not data_byte_range is None:
             raise NotImplementedError("Using data range not supported yet")
 
         # now split
@@ -113,11 +108,6 @@ t
         logger.debug(subprocess.check_output("find {}".format(PYTHON_MODULE_PATH), shell=True))
         logger.debug(subprocess.check_output("find {}".format(os.getcwd()), shell=True))
 
-        response_status['runtime_s3_key_used'] = runtime_s3_key_used
-        response_status['runtime_s3_bucket_used'] = runtime_s3_bucket_used
-
-        runtime_cached = download_runtime_if_necessary(s3_client, runtime_s3_bucket_used,
-                                                       runtime_s3_key_used)
         logger.info("Runtime ready, cached={}".format(runtime_cached))
         response_status['runtime_cached'] = runtime_cached
 
@@ -209,5 +199,4 @@ t
 
 if __name__ == "__main__":
     event_file = open(os.environ["queueMessage"])
-    az_handler(json.load(event_file), {})
-
+    az_handler(json.loads(event_file), {})

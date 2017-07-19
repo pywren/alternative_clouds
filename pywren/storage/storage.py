@@ -22,6 +22,8 @@ class Storage(object):
         self.backend_type = config['storage_backend']
         if config['storage_backend'] == 's3':
             self.backend_handler = S3Backend(config['backend_config'])
+        elif config['storage_backend'] == 'az':
+            self.backend_handler = AZBackend(config['backend_config'])
         else:
             raise NotImplementedError(("Using {} as storage backend is" +
                                        "not supported yet").format(config['storage_backend']))
