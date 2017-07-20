@@ -5,6 +5,7 @@ import os
 
 from  .exceptions import StorageNoSuchKeyError, StorageOutputNotFoundError
 from .s3_backend import S3Backend
+from .az_backend import AZBackend
 from .storage_utils import create_status_key, create_output_key, status_key_suffix
 
 
@@ -20,9 +21,9 @@ class Storage(object):
         self.storage_config = config
         self.prefix = config['storage_prefix']
         self.backend_type = config['storage_backend']
-        if config['storage_backend'] == 's3':
+        if self.backend_type == 's3':
             self.backend_handler = S3Backend(config['backend_config'])
-        elif config['storage_backend'] == 'az':
+        elif self.backend_type == 'az':
             self.backend_handler = AZBackend(config['backend_config'])
         else:
             raise NotImplementedError(("Using {} as storage backend is" +
@@ -102,14 +103,27 @@ def get_runtime_info(runtime_config):
     :param runtime_config: configuration of runtime (dictionary)
     :return: runtime metadata
     """
-    if runtime_config['runtime_storage'] != 's3':
-        raise NotImplementedError(("Storing runtime in non-S3 storage is not " +
-                                   "supported yet").format(runtime_config['runtime_storage']))
-    config = dict()
-    config['bucket'] = runtime_config['s3_bucket']
-    handler = S3Backend(config)
+    if runtime_config['runtime_storage'] == 's3':
+        config = dict()
+        config['bucket'] = runtime_config['s3_bucket']
+        handler = S3Backend(config)
 
-    key = runtime_config['s3_key'].replace(".tar.gz", ".meta.json")
-    json_str = handler.get_object(key)
-    runtime_meta = json.loads(json_str.decode("ascii"))
-    return runtime_meta
+        key = runtime_config['s3_key'].replace(".tar.gz", ".meta.json")
+        json_str = handler.get_object(key)
+        runtime_meta = json.loads(json_str.decode("ascii"))
+        return runtime_meta
+
+    if runtime_config['runtime_storage'] == 'az': 
+        config = dict()
+        config['container'] = runtime_config['az_container']
+        config['account'] = runtime_config['az_name']
+        config['key'] = runtime_config['az_key']
+        handler = AZBackend(config)
+
+        key = runtime_config['az_blob_name'].replace(".tar.gz", ".meta.json")
+        json_str = handler.get_object(key)
+        runtime_meta = json.loads(json_str.decode("ascii"))
+        return runtime_meta
+
+    raise NotImplementedError(("Storing runtime in non-S3 storage is not " +
+                                   "supported yet").format(runtime_config['runtime_storage']))

@@ -49,6 +49,8 @@ def lambda_executor(config=None, job_max_runtime=280):
 def azure_executor(config=None, job_max_runtime=100):
     if config is None:
         config = wrenconfig.default()
+    print "hello" 
+    print config
     QUEUE_NAME = config["az"]["queue_name"]
     ACCOUNT_NAME = config["az"]["account_name"]
     ACCESS_KEY = config["az"]["access_key"]
