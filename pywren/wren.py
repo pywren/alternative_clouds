@@ -21,12 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 def default_executor(**kwargs):
-    executor_str = 'lambda'
+    executor_str = 'az'
     if 'PYWREN_EXECUTOR' in os.environ:
         executor_str = os.environ['PYWREN_EXECUTOR']
 
     if executor_str == 'lambda':
         return lambda_executor(**kwargs)
+    elif executor_str == 'az':
+        return azure_executor(**kwargs)
     elif executor_str == 'remote' or executor_str == 'standalone':
         return remote_executor(**kwargs)
     elif executor_str == 'dummy':
@@ -42,6 +44,16 @@ def lambda_executor(config=None, job_max_runtime=280):
     FUNCTION_NAME = config['lambda']['function_name']
     invoker = invokers.LambdaInvoker(AWS_REGION, FUNCTION_NAME)
 
+    return Executor(invoker, config, job_max_runtime)
+
+def azure_executor(config=None, job_max_runtime=100):
+    if config is None:
+        config = wrenconfig.default()
+    QUEUE_NAME = config["az"]["queue_name"]
+    ACCOUNT_NAME = config["az"]["account_name"]
+    ACCESS_KEY = config["az"]["access_key"]
+    invoker = invokers.AzureInvoker(ACCOUNT_NAME, ACCESS_KEY, QUEUE_NAME)
+    print "harambe"
     return Executor(invoker, config, job_max_runtime)
 
 

@@ -81,6 +81,8 @@ def extract_storage_config(config):
     storage_config = dict()
     storage_config['storage_backend'] = config['storage_backend']
     storage_config['storage_prefix'] = config['storage_prefix']
+    print "OHNO"
+    print storage_config["storage_backend"]
     if storage_config['storage_backend'] == 's3':
         storage_config['backend_config'] = {}
         storage_config['backend_config']['bucket'] = config['s3']['bucket']

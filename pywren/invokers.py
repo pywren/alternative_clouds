@@ -40,14 +40,14 @@ class LambdaInvoker(object):
                 'region_name' : self.region_name}
 
 class AzureInvoker(object):
-    def __init__(self, config, queue_name):
+    def __init__(self, account, key, queue_name):
 
-        self.queue_service = QueueService(account_name = config["account"], account_key = config["key"])
+        self.queue_service = QueueService(account_name = account, account_key = key)
         self.queue = queue_name
         self.TIME_LIMIT = True
 
     def invoke(self, payload):
-        self.queue_service.put_message(self.queue, str(payload))
+        self.queue_service.put_message(self.queue, json.dumps(payload))
         return {}
 
     def config(self):

@@ -38,7 +38,6 @@ class Executor(object):
         self.storage = storage.Storage(self.storage_config)
         self.runtime_meta_info = runtime.get_runtime_info(config['runtime'])
 
-
         if 'preinstalls' in self.runtime_meta_info:
             logger.info("using serializer with meta-supplied preinstalls")
             self.serializer = serialize.SerializeIndependent(self.runtime_meta_info['preinstalls'])
@@ -206,6 +205,7 @@ class Executor(object):
         self.storage.put_func(func_key, func_module_str)
         host_job_meta['func_upload_time'] = time.time() - func_upload_time
         host_job_meta['func_upload_timestamp'] = time.time()
+        print "HI"
         def invoke(data_str, callset_id, call_id, func_key,
                    host_job_meta,
                    agg_data_key=None, data_byte_range=None):
