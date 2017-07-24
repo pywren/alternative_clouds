@@ -47,7 +47,7 @@ class AzureInvoker(object):
         self.TIME_LIMIT = True
 
     def invoke(self, payload):
-        self.queue_service.put_message(self.queue, json.dumps(payload))
+        self.queue_service.put_message(self.queue, json.dumps(payload, ensure_ascii=False))
         return {}
 
     def config(self):

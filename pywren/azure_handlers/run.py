@@ -71,9 +71,9 @@ def generic_handler(event, context_dict):
         start_time = time.time()
         response_status['start_time'] = start_time
 
-        func_filename = os.environ["func_file"]
-        data_filename = os.environ["data_file"]
-        output_filename = os.environ["output_file"]
+        func_filename = os.environ["funcfile"]
+        data_filename = os.environ["datafile"]
+        output_filename = os.environ["outputfile"]
 
         # download times don't make sense on azure since everything's preloaded.
 
@@ -193,7 +193,7 @@ def generic_handler(event, context_dict):
         response_status['exception_args'] = e.args
         response_status['exception_traceback'] = traceback.format_exc()
     finally:
-        status_file = open(os.environ["status_file"], 'w')
+        status_file = open(os.environ["statusfile"], 'w')
         status_file.write(json.dumps(response_status))
         status_file.close()
 

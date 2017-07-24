@@ -1,5 +1,5 @@
 from azure.storage.blob import BlockBlobService
-
+from azure.common import AzureMissingResourceHttpError
 from .exceptions import StorageNoSuchKeyError
 
 class AZBackend(object):
@@ -9,6 +9,8 @@ class AZBackend(object):
 
     def __init__(self, config):
         self.container = config["container"]
+        self.acc = config["account"]
+        self.key = config["key"]
         self.block_blob_service = BlockBlobService(
             account_name=config["account"],
             account_key=config["key"],
@@ -39,12 +41,12 @@ class AZBackend(object):
         """
         try:
             r = self.block_blob_service.get_blob_to_bytes(
-                container = self.container,
+                container_name = self.container,
                 blob_name = key,
             )
             return r.content
 
-        except azure.common.AzureMissingResourceHttpError as e:
+        except AzureMissingResourceHttpError as e:
             raise StorageNoSuchKeyError(key)
 
     def key_exists(self, key):

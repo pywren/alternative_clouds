@@ -78,11 +78,14 @@ def create_keys(prefix, callset_id, call_id):
 
 
 def get_storage_path(config):
-    if config['storage_backend'] != 's3':
-        raise NotImplementedError(
-            ("Using {} as storage backend is not supported yet").format(
-                config['storage_backend']))
-    return [config['storage_backend'], config['backend_config']['bucket'], config['storage_prefix']]
+    print config
+    if config['storage_backend'] == 's3':
+        return [config['storage_backend'], config['backend_config']['bucket'], config['storage_prefix']]
+    elif config['storage_backend'] == 'az':
+        return [config['storage_backend'], config['backend_config']['container'], config['storage_prefix']]
+    raise NotImplementedError(
+        ("Using {} as storage backend is not supported yet").format(
+            config['storage_backend']))
 
 
 def check_storage_path(config, prev_path):

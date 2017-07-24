@@ -31,6 +31,7 @@ class Executor(object):
 
     def __init__(self, invoker, config, job_max_runtime):
         self.invoker = invoker
+        print type(self.invoker)
         self.job_max_runtime = job_max_runtime
 
         self.config = config
@@ -83,7 +84,7 @@ class Executor(object):
             'runtime' : self.config['runtime'],
             'pywren_version' : version.__version__,
             'runtime_url' : runtime_url}
-
+        print func_key
         if extra_env is not None:
             logger.debug("Extra environment vars {}".format(extra_env))
             arg_dict['extra_env'] = extra_env
@@ -107,7 +108,6 @@ class Executor(object):
 
         # do the invocation
         self.invoker.invoke(arg_dict)
-
         host_job_meta['lambda_invoke_timestamp'] = lambda_invoke_time_start
         host_job_meta['lambda_invoke_time'] = time.time() - lambda_invoke_time_start
 
@@ -123,7 +123,7 @@ class Executor(object):
         fut = ResponseFuture(call_id, callset_id, host_job_meta, storage_path)
 
         fut._set_state(JobState.invoked)
-
+        print "hi"
         return fut
 
     def call_async(self, func, data, extra_env=None,
@@ -169,6 +169,7 @@ class Executor(object):
         data_size_bytes = sum(len(x) for x in data_strs)
         agg_data_key = None
         host_job_meta['agg_data'] = False
+        print "mapping"
         host_job_meta['data_size_bytes'] = data_size_bytes
 
         if data_size_bytes < wrenconfig.MAX_AGG_DATA_SIZE and data_all_as_one:
@@ -176,6 +177,7 @@ class Executor(object):
             agg_data_bytes, agg_data_ranges = self.agg_data(data_strs)
             agg_upload_time = time.time()
             self.storage.put_data(agg_data_key, agg_data_bytes)
+            print "WE PUT HERE"
             host_job_meta['agg_data'] = True
             host_job_meta['data_upload_time'] = time.time() - agg_upload_time
             host_job_meta['data_upload_timestamp'] = time.time()
@@ -205,7 +207,6 @@ class Executor(object):
         self.storage.put_func(func_key, func_module_str)
         host_job_meta['func_upload_time'] = time.time() - func_upload_time
         host_job_meta['func_upload_timestamp'] = time.time()
-        print "HI"
         def invoke(data_str, callset_id, call_id, func_key,
                    host_job_meta,
                    agg_data_key=None, data_byte_range=None):
@@ -213,7 +214,6 @@ class Executor(object):
                 = storage_utils.create_keys(self.storage.prefix, callset_id, call_id)
 
             host_job_meta['job_invoke_timestamp'] = time.time()
-
             if agg_data_key is None:
                 data_upload_time = time.time()
                 self.put_data(data_key, data_str,
