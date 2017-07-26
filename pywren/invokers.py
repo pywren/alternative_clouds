@@ -5,8 +5,9 @@ import os
 
 import botocore
 import botocore.session
-from azure.storage.queue import QueueService
+from azure.storage.queue import QueueService, QueueMessageFormat
 from pywren import local
+import base64
 
 SOURCE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,11 +44,12 @@ class AzureInvoker(object):
     def __init__(self, account, key, queue_name):
 
         self.queue_service = QueueService(account_name = account, account_key = key)
+        self.queue_service.encode_function = QueueMessageFormat.text_base64encode
         self.queue = queue_name
         self.TIME_LIMIT = True
 
     def invoke(self, payload):
-        self.queue_service.put_message(self.queue, json.dumps(payload, ensure_ascii=False))
+        self.queue_service.put_message(self.queue, json.dumps(payload, ensure_ascii=False).decode('utf-8'))
         return {}
 
     def config(self):

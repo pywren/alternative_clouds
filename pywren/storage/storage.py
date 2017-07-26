@@ -21,13 +21,11 @@ class Storage(object):
         self.storage_config = config
         self.prefix = config['storage_prefix']
         self.backend_type = config['storage_backend']
-        print self.backend_type
         if self.backend_type == 's3':
             self.backend_handler = S3Backend(config['backend_config'])
         elif self.backend_type == 'az':
             self.backend_handler = AZBackend(config['backend_config'])
         else:
-            print "erroring"
             raise NotImplementedError(("Using {} as storage backend is" +
                                        "not supported yet").format(config['storage_backend']))
 
@@ -92,7 +90,6 @@ class Storage(object):
         :param call_id: call ID of the call
         :return: Output of the call.
         """
-        print "hiere"
         output_key = create_output_key(self.prefix, callset_id, call_id)
         try:
             return self.backend_handler.get_object(output_key)

@@ -13,11 +13,13 @@ from threading import Thread
 
 if sys.version_info > (3, 0):
     from queue import Queue, Empty
-    from . import version
+#this breaks for now
+#    from . import version
 
 else:
     from Queue import Queue, Empty
-    import version
+#this breaks for now
+#    import version
 
 TEMP = "D:\local\Temp"
 PYTHON_MODULE_PATH = os.path.join(TEMP, "modules")
@@ -40,11 +42,11 @@ def b64str_to_bytes(str_data):
     return byte_data
 
 def az_handler(event, context):
-    logger.setlevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     return generic_handler(event, context)
 
 def get_server_info():
-    server_info = {'uname': ' '.join(os.uname())}
+    server_info = {'uname': ' '.join(sys.platform)}
     return server_info
 
 def generic_handler(event, context_dict):
@@ -63,7 +65,7 @@ def generic_handler(event, context_dict):
 
         # download the input
         data_byte_range = event['data_byte_range']
-
+        job_max_runtime = event.get('job_max_runtime', 300)
 #        if version.__version__ != event['pywren_version']:
 #            raise Exception("WRONGVERSION", "Pywren version mismatch",
 #                            version.__version__, event['pywren_version'])
@@ -77,8 +79,23 @@ def generic_handler(event, context_dict):
 
         # download times don't make sense on azure since everything's preloaded.
 
-        if not data_byte_range is None:
-            raise NotImplementedError("Using data range not supported yet")
+        if data_byte_range is None:
+            pass
+
+        # The byte range is the entire file, which is already loaded.
+        elif data_byte_range[0] == 0 \
+                 and data_byte_range[1] + 1 == os.path.getsize(data_filename):
+            pass
+
+        else:
+            #lmao what is this
+            data_write_fid = open(data_filename, 'wb')
+            data_read_fid = open(data_filename, "rb")
+            data_read_fid.seek(data_byte_range[0])
+            read_data = data_read_fid.read(data_byte_range[1] + 1)
+            data_write_fid.write(read_data)
+            data_write_fid.close()
+            data_read_fid.close()
 
         # now split
         d = json.load(open(func_filename, 'r'))
@@ -105,11 +122,11 @@ def generic_handler(event, context_dict):
             fid.write(b64str_to_bytes(m_data))
             fid.close()
         logger.info("Finished writing {} module files".format(len(d['module_data'])))
-        logger.debug(subprocess.check_output("find {}".format(PYTHON_MODULE_PATH), shell=True))
-        logger.debug(subprocess.check_output("find {}".format(os.getcwd()), shell=True))
 
-        logger.info("Runtime ready, cached={}".format(runtime_cached))
-        response_status['runtime_cached'] = runtime_cached
+        logger.debug(subprocess.check_output("dir /S/B {}".format(PYTHON_MODULE_PATH), shell=True))
+        logger.debug(subprocess.check_output("dir /S/B  {}".format(os.getcwd()), shell=True))
+        #logger.info("Runtime ready, cached={}".format(runtime_cached))
+        #response_status['runtime_cached'] = runtime_cached
 
         cwd = os.getcwd()
         jobrunner_path = os.path.join(cwd, "jobrunner.py")
@@ -145,7 +162,7 @@ def generic_handler(event, context_dict):
         # This is copied from http://stackoverflow.com/a/17698359/4577954
         # reasons for setting process group: http://stackoverflow.com/a/4791612
         process = subprocess.Popen(cmdstr, shell=True, env=local_env, bufsize=1,
-                                   stdout=subprocess.PIPE, preexec_fn=os.setsid)
+                                   stdout=subprocess.PIPE)
 
         logger.info("launched process")
         def consume_stdout(stdout, queue):
@@ -198,5 +215,5 @@ def generic_handler(event, context_dict):
         status_file.close()
 
 if __name__ == "__main__":
-    event_file = open(os.environ["queueMessage"])
+    event_file = open(os.environ["queueMessage"]).read()
     az_handler(json.loads(event_file), {})

@@ -97,11 +97,9 @@ class ResponseFuture(object):
             storage_config = wrenconfig.extract_storage_config(wrenconfig.default())
             storage_handler = storage.Storage(storage_config)
 
-            print storage_config
         storage_utils.check_storage_path(storage_handler.get_storage_config(), self.storage_path)
 
         call_status = storage_handler.get_call_status(self.callset_id, self.call_id)
-        print call_status
         self.status_query_count += 1
 
         ## FIXME implement timeout

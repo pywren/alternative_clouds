@@ -78,7 +78,6 @@ def create_keys(prefix, callset_id, call_id):
 
 
 def get_storage_path(config):
-    print config
     if config['storage_backend'] == 's3':
         return [config['storage_backend'], config['backend_config']['bucket'], config['storage_prefix']]
     elif config['storage_backend'] == 'az':
