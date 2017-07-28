@@ -3,8 +3,8 @@ from __future__ import absolute_import
 import json
 import os
 
-import botocore
-import botocore.session
+#import botocore
+#import botocore.session
 from azure.storage.queue import QueueService, QueueMessageFormat
 from pywren import local
 import base64

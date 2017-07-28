@@ -1,4 +1,4 @@
-import botocore
+#import botocore
 
 from .exceptions import StorageNoSuchKeyError
 

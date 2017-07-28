@@ -13,13 +13,9 @@ from threading import Thread
 
 if sys.version_info > (3, 0):
     from queue import Queue, Empty
-#this breaks for now
-#    from . import version
 
 else:
     from Queue import Queue, Empty
-#this breaks for now
-#    import version
 
 TEMP = "D:\local\Temp"
 PYTHON_MODULE_PATH = os.path.join(TEMP, "modules")
@@ -64,8 +60,8 @@ def generic_handler(event, context_dict):
         logger.info("invocation started")
 
         # download the input
-        data_byte_range = event['data_byte_range']
-        job_max_runtime = event.get('job_max_runtime', 300)
+        data_byte_range = event["data_byte_range"]
+        job_max_runtime = event.get("job_max_runtime", 300)
 #        if version.__version__ != event['pywren_version']:
 #            raise Exception("WRONGVERSION", "Pywren version mismatch",
 #                            version.__version__, event['pywren_version'])
@@ -105,8 +101,9 @@ def generic_handler(event, context_dict):
         for m_filename, m_data in d['module_data'].items():
             m_path = os.path.dirname(m_filename)
 
-            if len(m_path) > 0 and m_path[0] == "/":
+            if len(m_path) > 0 and m_path[0] == "\\":
                 m_path = m_path[1:]
+            m_path = os.path.join(*filter(lambda x: len(x) > 0, m_path.split("/")))
             to_make = os.path.join(PYTHON_MODULE_PATH, m_path)
             #print "to_make=", to_make, "m_path=", m_path
             try:
@@ -129,10 +126,10 @@ def generic_handler(event, context_dict):
         #response_status['runtime_cached'] = runtime_cached
 
         cwd = os.getcwd()
-        jobrunner_path = os.path.join(cwd, "jobrunner.py")
+        jobrunner_path = "D:\\home\\site\\wwwroot\\jobrunner\\run.py"
 
         extra_env = event.get('extra_env', {})
-        extra_env['PYTHONPATH'] = "{}:{}".format(os.getcwd(), PYTHON_MODULE_PATH)
+        extra_env['PYTHONPATH'] = "{};{}".format(os.getcwd(), PYTHON_MODULE_PATH)
 
         call_id = event['call_id']
         callset_id = event['callset_id']
@@ -156,7 +153,7 @@ def generic_handler(event, context_dict):
         local_env["OMP_NUM_THREADS"] = "1"
         local_env.update(extra_env)
 
-        local_env['PATH'] = "{}:{}".format(CONDA_PYTHON_PATH, local_env.get("PATH", ""))
+        local_env['PATH'] = "{};{}".format(CONDA_PYTHON_PATH, local_env.get("PATH", ""))
 
         logger.debug("command str=%s", cmdstr)
         # This is copied from http://stackoverflow.com/a/17698359/4577954

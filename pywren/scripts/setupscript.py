@@ -4,8 +4,8 @@ import random
 import re
 import time
 
-import boto3
-import botocore
+#import boto3
+#import botocore
 import click
 import pywren.wrenconfig
 from pywren.scripts import pywrencli

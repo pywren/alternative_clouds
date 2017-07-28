@@ -6,7 +6,7 @@ import random
 import time
 from multiprocessing.pool import ThreadPool
 
-import boto3
+#import boto3
 
 import pywren.runtime as runtime
 import pywren.storage as storage
@@ -160,7 +160,7 @@ class Executor(object):
 
         ### pickle func and all data (to capture module dependencies
         func_and_data_ser, mod_paths = self.serializer([func] + data)
-
+        print mod_paths
         func_str = func_and_data_ser[0]
         data_strs = func_and_data_ser[1:]
         data_size_bytes = sum(len(x) for x in data_strs)

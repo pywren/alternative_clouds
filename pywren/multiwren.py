@@ -2,7 +2,7 @@ import time
 import uuid
 from multiprocessing.pool import ThreadPool
 
-import boto3
+#import boto3
 import numpy as np
 from pywren import wren
 

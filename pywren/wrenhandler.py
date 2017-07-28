@@ -11,8 +11,8 @@ import time
 import traceback
 from threading import Thread
 
-import boto3
-import botocore
+#import boto3
+#import botocore
 
 if sys.version_info > (3, 0):
     from queue import Queue, Empty

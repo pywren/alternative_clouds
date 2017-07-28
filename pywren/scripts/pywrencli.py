@@ -8,9 +8,9 @@ import sys
 import time
 import zipfile
 
-import boto3
-import botocore
-import botocore.exceptions
+#import boto3
+#import botocore
+#import botocore.exceptions
 import click
 import pywren
 import pywren.runtime

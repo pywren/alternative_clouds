@@ -16,7 +16,7 @@ except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import urlopen
 
-import boto3
+#import boto3
 import click
 import watchtower
 from glob2 import glob
