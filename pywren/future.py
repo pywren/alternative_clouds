@@ -120,7 +120,7 @@ class ResponseFuture(object):
 
         self.run_status = call_status # this is the remote status information
         self.invoke_status = self._invoke_metadata # local status information
-
+        print call_status['server_info']
         if call_status['exception'] is not None:
             # the wrenhandler had an exception
             exception_str = call_status['exception']
