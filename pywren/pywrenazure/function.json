@@ -9,28 +9,28 @@
     },
     {
       "type": "blob",
-      "name": "status_file",
+      "name": "statusfile",
       "path": "azure-webjobs-hosts/foo/{status_key}",
       "connection": "AzureWebJobsDashboard",
       "direction": "out"
     },
     {
       "type": "blob",
-      "name": "output_file",
+      "name": "outputfile",
       "path": "azure-webjobs-hosts/foo/{output_key}",
       "connection": "AzureWebJobsDashboard",
       "direction": "out"
     },
     {
       "type": "blob",
-      "name": "data_file",
+      "name": "datafile",
       "path": "azure-webjobs-hosts/foo/{data_key}",
       "connection": "AzureWebJobsStorage",
       "direction": "in"
     },
     {
       "type": "blob",
-      "name": "func_file",
+      "name": "funcfile",
       "path": "azure-webjobs-hosts/foo/{func_key}",
       "connection": "AzureWebJobsStorage",
       "direction": "in"
