@@ -70,12 +70,12 @@ class AZBackend(object):
 
         while True:
             paginator = self.block_blob_service.list_blobs(
-                container = self.container,
+                container_name = self.container,
                 prefix = pref,
                 marker = next_token,
             )
             for blob in paginator:
-                key_list.apend(blob.name)
+                key_list.append(blob.name)
             next_token = paginator.next_marker
             if len(next_token) == 0:
                 break
