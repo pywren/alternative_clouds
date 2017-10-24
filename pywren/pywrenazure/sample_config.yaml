@@ -1,0 +1,19 @@
+storage_backend: az
+
+account:
+    aws_account_id: 899133214451
+    aws_lambda_role: pywren_exec_role_1
+    aws_region: us-west-2
+
+az:
+    container: azure-webjobs-hosts
+    pywren_prefix: pywren.jobs
+    queue_name : pywrenqueue
+
+runtime:
+    runtime_storage: az
+    az_name: azurefunctions3a99913e
+    az_key: aRh45HwCKzzCgx4q/ksv9my2FMf2o407Fo7xLvCEAgUvip0bRc8PNm6Nn6P/z0rnttlat6IIxaXdvFbDnRg88A==
+    az_container: azure-webjobs-hosts
+    az_blob_name: pywren.runtime/pywren_runtime-2.7-default.tar.gz
+

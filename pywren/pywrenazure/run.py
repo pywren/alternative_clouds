@@ -17,6 +17,9 @@ if sys.version_info > (3, 0):
 else:
     from Queue import Queue, Empty
 
+# temp disk.
+# Note that in Windows, the path delimeters are \
+# and the delimeter between paths in a PATH variable is ; instead of :
 TEMP = "D:\local\Temp"
 PYTHON_MODULE_PATH = os.path.join(TEMP, "modules")
 
@@ -24,12 +27,13 @@ logger = logging.getLogger(__name__)
 
 PROCESS_STDOUT_SLEEP_SECS = 2
 
+
 def download_runtime_if_necessary(azclient, runtime_bucket, runtime_key):
     """
     Download the runtime if necessary
+    We store the runtime in persistent storage, so we never need to download the runtime.
     return True if cached, False if not (download occured)
     """
-    # figure this out later.
     return True
 
 def b64str_to_bytes(str_data):
@@ -42,6 +46,9 @@ def az_handler(event, context):
     return generic_handler(event, context)
 
 def get_server_info():
+    """
+    Stuff for mucking around. 
+    """
     server_info = {'uname': ' '.join(sys.platform)}
     return server_info
 
@@ -51,6 +58,7 @@ def generic_handler(event, context_dict):
     that we are running in, provided by the scheduler
     """
     response_status = {'exception': None}
+
     try:
         if event['storage_config']['storage_backend'] != 'az':
             raise NotImplementedError(("Using {} as storage backend is not supported " +
@@ -62,6 +70,8 @@ def generic_handler(event, context_dict):
         # download the input
         data_byte_range = event["data_byte_range"]
         job_max_runtime = event.get("job_max_runtime", 300)
+        
+        #eventually this will have version checks.
 #        if version.__version__ != event['pywren_version']:
 #            raise Exception("WRONGVERSION", "Pywren version mismatch",
 #                            version.__version__, event['pywren_version'])
@@ -69,11 +79,14 @@ def generic_handler(event, context_dict):
         start_time = time.time()
         response_status['start_time'] = start_time
 
+        # `funcfile, `datafile`, `outputfile` are 
+        # hard coded environment variable names from `function.json`.
+        # They each contian file paths that you read and write from.
         func_filename = os.environ["funcfile"]
         data_filename = os.environ["datafile"]
         output_filename = os.environ["outputfile"]
 
-        # download times don't make sense on azure since everything's preloaded.
+        # read specific input data bytes         
 
         if data_byte_range is None:
             pass
@@ -83,8 +96,9 @@ def generic_handler(event, context_dict):
                  and data_byte_range[1] + 1 == os.path.getsize(data_filename):
             pass
 
+        # Read entire file into memory, and then write a specific range range back to disk.
+        # There probably is an easier way to do this.
         else:
-            #lmao what is this
             data_write_fid = open(data_filename, 'wb')
             data_read_fid = open(data_filename, "rb")
             data_read_fid.seek(data_byte_range[0])
@@ -120,12 +134,9 @@ def generic_handler(event, context_dict):
             fid.close()
         logger.info("Finished writing {} module files".format(len(d['module_data'])))
 
-        logger.debug(subprocess.check_output("dir /S/B {}".format(PYTHON_MODULE_PATH), shell=True))
-        logger.debug(subprocess.check_output("dir /S/B  {}".format(os.getcwd()), shell=True))
-        #logger.info("Runtime ready, cached={}".format(runtime_cached))
-        #response_status['runtime_cached'] = runtime_cached
-
         cwd = os.getcwd()
+        # I deployed jobrunner.py as a separate function. This isn't necessary because
+        # you can just deploy jobrunner as a local file with your deployment zip.
         jobrunner_path = "D:\\home\\site\\wwwroot\\jobrunner\\run.py"
 
         extra_env = event.get('extra_env', {})
@@ -211,6 +222,7 @@ def generic_handler(event, context_dict):
         status_file.write(json.dumps(response_status))
         status_file.close()
 
+# Azure just runs this python script as __main__
 if __name__ == "__main__":
     event_file = open(os.environ["queueMessage"]).read()
     az_handler(json.loads(event_file), {})
