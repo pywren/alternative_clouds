@@ -2,16 +2,16 @@
 
 ## Getting started
 
-Set up your (google cloud account)[https://developers.google.com/identity/protocols/application-default-credentials], and make sure that the environment variable `GOOGLE_APPLICATION_CREDENTIALS` points to your auth credentials
+Set up your [google cloud account](https://developers.google.com/identity/protocols/application-default-credentials) and make sure that the environment variable `GOOGLE_APPLICATION_CREDENTIALS` points to your auth credentials
 
-Follow the steps on (this page)[https://cloud.google.com/functions/docs/quickstart]. These will help you set up the gcloud SDK and enable the Google Cloud Functions API. The important steps are: 
+Follow the steps on [this page](https://cloud.google.com/functions/docs/quickstart). These will help you set up the gcloud SDK and enable the Google Cloud Functions API. The important steps are: 
 
 1. Set up a Google Cloud project and enable billing for storage and Google Cloud Functions. Note the `projectID`.
 
 2. Enable the Google Cloud Functions API
 
 3. Make sure you have the `gsutil` and `gcloud` command line utilities.
-    Instructions on setting up the `gcloud` environment on your machine are (here)[https://cloud.google.com/sdk/docs/]
+    Instructions on setting up the `gcloud` environment on your machine are [here](https://cloud.google.com/sdk/docs/)
 
 4. run `gcloud components update && gcloud components install beta`
 
