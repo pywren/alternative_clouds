@@ -26,17 +26,33 @@ gsutil mb -p <projectID> gs://bucket_name
 ```
 
 ## Deployment
-A google cloud function is deployed as a node module. In your `index.json`, there is a line that looks like
+
+### set-up
+A google cloud function is deployed as a node module. Set up a directory for eveyrthing to be staged.
+** Important: do not start a git repo in the same directory as your function code. The deploy command zips up everything in the current folder, and including `.git` takes up  unnecessary space`
+
+```
+mkdir pywren_gcf
+mv package.json pywren_gcf
+mv index.js pywren_gcf
+cd pywren_gcf
+```
+
+`package.json` specifies function metadata, including dependencies. These include utilities for interacting with the file system, and google cloud storage. To install, run
+
+```
+npm install
+```
+
+### `index.js`
+The function handler is in `index.js`. In  `index.json`, there is a line that looks like
 ```
 exports.handler = function(req, res) {}
 ```
 
 `handler` is the name of deployed function. Notice that `function(req, res)` basically has Express.js handles. `req` has the POST request body, and `res` is the HTTP response.
 
-There is also  a `package.json` that specifies function metadata, including dependencies, and `node_modules`, which include utilities for interacting with the file system, and google cloud storage.
-
-** Important: do not start a git repo in the same directory as your function code. The deploy command zips up everything in the current folder, and including `.git` takes up  unnecessary space`
-
+### Deploying
 On the command line, run 
 ```
 gcloud beta functions deploy handler --stage-bucket bucket_name --trigger-http --memory 2048 --timeout 540 
