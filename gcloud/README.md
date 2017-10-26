@@ -67,3 +67,17 @@ The request looks something like
 curl -X POST https://<REGION>-<projectID>.cloudfunctions.net/handler -H "Content-Type:application/json" --data '<data payload>'
 ```
 where `<REGION>` is `us-central1`, because that's the only available deployment region.
+
+In Python, this looks like 
+
+```
+from requests import post
+URL ="https://{}-{}.cloudfunctions.net/{}".format(region_name, project_name, gcf_name)
+HEADERS = {"Content-Type":"application/json"}
+res = post(URL, headers=HEADERS, json = payload)
+```
+
+## Storage
+The code in `storage/gcs_service.py` has the same API as `storage/s3_backend.py`
+
+
