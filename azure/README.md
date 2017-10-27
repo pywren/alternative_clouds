@@ -3,7 +3,10 @@
 ** NOTE: Python on Azure has been deprecated and removed. As of October 2017, none of the code here works becuase any Python function automatically crashes and errors. **
 
 ## Getting started
-1. `pip install azure-storage`
+
+1.  make sure you have an azure account
+    a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that.
+2. `pip install azure-storage`
 2. 
 
 ## Deployment
@@ -17,6 +20,14 @@ The following files need to be zipped and PUT to the endpoint `https:{function_n
 * `jobrunner.py` This runs in a subprocess to unpickle the function, and puts the output in storage.
 * `run.py` same as wrenhandler
 * `pywren.version.py` Version.
+
+### Runtimes
+We can deploy a runtime directly to the function container using Azure's Kudu service. This gives us a few advantages
+
+* Azure functions gives you access to **persistent** storage. This means that we don't have to pull a runtime from cloud storage every invocation, since we can just stick one in persistent storage. 
+* Because Azure doesn't have isolation between concurrent containers, sticking a runtime into persistent storage means we don't have to deal with any race conditions or coordination between threads trying to write the same binary to the same location.
+
+
 
 ## Invoking
 In order to have asynchronous invocation, we use Queue Triggers. This works similar to PyWren on AWS. We pack all of our arguments into a dict, serialize it into a JSON string, and drop an arg string into the queue for each task we want to run. Under the hood, Azure will parse the json and do any processing or preparation necessary before your function starts. 
