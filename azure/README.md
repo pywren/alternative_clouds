@@ -27,6 +27,17 @@ We can deploy a runtime directly to the function container using Azure's Kudu se
 * Azure functions gives you access to **persistent** storage. This means that we don't have to pull a runtime from cloud storage every invocation, since we can just stick one in persistent storage. 
 * Because Azure doesn't have isolation between concurrent containers, sticking a runtime into persistent storage means we don't have to deal with any race conditions or coordination between threads trying to write the same binary to the same location.
 
+To deploy a runtime, we need a few steps:
+1. Get a runtime 
+    a. Azure Functions containers run Windows Server 2012, so we'd need to create the runtime on a VM running Windows. Unfortunately, you can't SSH onto a windows VM without installing and running cygwin first. The only way to access a windows VM is through Remote Desktop Protocol.
+        i. Linux containers are planned to come out in the future though.
+    b. I have a `python 2.7` runtime publicly available in a storage bucket that we can pull from. I made this manually, RDPing onto a machine, setting up conda, and installing packages. This is the only way to make a runtime right now.
+2. Deploy it in the container
+    a. PUT
+    b. Navigate to ___ on the browser
+    c. tar command
+
+The code for fetching and deploying a runtime is in `./pywrenazure/runtime.py`
 
 
 ## Invoking
