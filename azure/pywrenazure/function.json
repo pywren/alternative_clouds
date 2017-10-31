@@ -10,28 +10,28 @@
     {
       "type": "blob",
       "name": "statusfile",
-      "path": "azure-webjobs-hosts/foo/{status_key}",
+      "path": "pywren1/{status_key}",
       "connection": "AzureWebJobsDashboard",
       "direction": "out"
     },
     {
       "type": "blob",
       "name": "outputfile",
-      "path": "azure-webjobs-hosts/foo/{output_key}",
+      "path": "pywren1/{output_key}",
       "connection": "AzureWebJobsDashboard",
       "direction": "out"
     },
     {
       "type": "blob",
       "name": "datafile",
-      "path": "azure-webjobs-hosts/foo/{data_key}",
+      "path": "pywren1/{data_key}",
       "connection": "AzureWebJobsStorage",
       "direction": "in"
     },
     {
       "type": "blob",
       "name": "funcfile",
-      "path": "azure-webjobs-hosts/foo/{func_key}",
+      "path": "pywren1/{func_key}",
       "connection": "AzureWebJobsStorage",
       "direction": "in"
     }
