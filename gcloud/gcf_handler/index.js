@@ -102,8 +102,8 @@ exports.handler = function wrenhandler (req, res) {
         data.createReadStream(
           options
         ).on('error', function(err) {console.log(err);})
-        .pipe(fs.createWriteStream(data_filename));
-        }
+          .pipe(fs.createWriteStream(data_filename));
+        
         var attempt_python = spawn(conda_path + "/python", ["jobrunner.py", func_filename, data_filename, output_filename]);
         var pythonProc = attempt_python.childProcess;
 
