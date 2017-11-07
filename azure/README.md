@@ -5,20 +5,24 @@
 ## Getting started
 
 1.  make sure you have an azure account
-    a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that.
+    a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that. This means that we have to keep 
 2. `pip install azure-storage`
 2. 
 
 ## Deployment
-Azure gives you two options to deploy a function: web portal or via HTTP Put
-* Deploying with web portal isn't a great fit because we need to upload `jobrunner.py`, so the better option is to deploy with HTTP.
-* HTTP PUT also makes it easier for us to set up file IO, which is very wonky in Azure.
+Azure gives you two options to deploy a function: web portal or via HTTP Put.
+
+I think using HTTP PUT is better for the following reasons.
+* It's impossible to upload auxiliary files over the web portal, so there's no clean way to upload `jobrunner.py` (aside from some silly hacks)
+* There are a lot of settings and set-up that we need to do, to set up file IO and triggers. Thankfully, I've figured all of this out for you. With HTTP, we can hard code all of these settings in `function.json` and load them.
 
 The following files need to be zipped and PUT to the endpoint `https:{function_name}.scm.azurewebsites.net/api/zip/site/wwwroot`
 
 * `function.json` this is the config file. 
 * `jobrunner.py` This runs in a subprocess to unpickle the function, and puts the output in storage.
-* `run.py` same as wrenhandler. `run.py` is what Azure runs when you trigger a function.
+* `run.py` same as wrenhandler. `run.py` is what Azure runs when you trigger a function. 
+
+To deploy everything, simply run `pywrenazure/deploy.py`
 
 ### Runtimes
 We can deploy a runtime directly to the function container using Azure's Kudu service. This gives us a few advantages
