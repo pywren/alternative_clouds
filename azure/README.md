@@ -18,8 +18,7 @@ The following files need to be zipped and PUT to the endpoint `https:{function_n
 
 * `function.json` this is the config file. 
 * `jobrunner.py` This runs in a subprocess to unpickle the function, and puts the output in storage.
-* `run.py` same as wrenhandler
-* `pywren.version.py` Version.
+* `run.py` same as wrenhandler. `run.py` is what Azure runs when you trigger a function.
 
 ### Runtimes
 We can deploy a runtime directly to the function container using Azure's Kudu service. This gives us a few advantages
