@@ -25,6 +25,7 @@ file_like_object = io.BytesIO()
 zipfile_obj = zipfile.ZipFile(file_like_object, mode='w')
 
 zipfile_obj.writestr("condaruntime.tar.gz", condaruntime_binary)
+zipfile_obj.write("./extract.py")
 
 zipfile_obj.close()
 

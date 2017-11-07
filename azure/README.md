@@ -33,13 +33,10 @@ To deploy a runtime, we need a few steps:
         i. Linux containers are planned to come out in the future though.
     b. I have a `python 2.7` runtime publicly available in a storage bucket that we can pull from. I made this manually, RDPing onto a machine, setting up conda, and installing packages. This is the only way to make a runtime right now.
 2. Deploy it in the container
-    a. PUT
+    a. Run `pywrenazure/runtime.py`. This will fetch the runtime from azure storage and deploy it to the function container. 
     b. Navigate to `https://{function_name}.scm.azurewebsites.net` on the browser
-    c. Navigate to the debug console 
+    c. Navigate to Debug Console -> CMD
     d. Run `extract.py` to extract the conda runtime into the location `D:\home\site\wwwroot\conda\Miniconda2`
-
-The code for fetching and deploying a runtime is in `./pywrenazure/runtime.py`
-
 
 
 ## Invoking
