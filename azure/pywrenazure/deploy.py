@@ -22,7 +22,7 @@ SOURCE_DIR = os.path.dirname(os.path.abspath(__file__))
 file_like_object = io.BytesIO()
 zipfile_obj = zipfile.ZipFile(file_like_object, mode='w')
 
-for f in ['function.json', 'run.py', 'jobrunner.py',
+for f in ['function.json', 'run.py', 'jobrunner.py', "test.py",
           '../version.py']:
     f = os.path.abspath(os.path.join(SOURCE_DIR, f))
     a = os.path.relpath(f, SOURCE_DIR + "/..")

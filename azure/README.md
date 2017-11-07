@@ -34,10 +34,12 @@ To deploy a runtime, we need a few steps:
     b. I have a `python 2.7` runtime publicly available in a storage bucket that we can pull from. I made this manually, RDPing onto a machine, setting up conda, and installing packages. This is the only way to make a runtime right now.
 2. Deploy it in the container
     a. PUT
-    b. Navigate to ___ on the browser
-    c. tar command
+    b. Navigate to `https://{function_name}.scm.azurewebsites.net` on the browser
+    c. Navigate to the debug console 
+    d. Run `extract.py` to extract the conda runtime into the location `D:\home\site\wwwroot\conda\Miniconda2`
 
 The code for fetching and deploying a runtime is in `./pywrenazure/runtime.py`
+
 
 
 ## Invoking
