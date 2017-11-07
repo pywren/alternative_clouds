@@ -4,10 +4,11 @@
 
 ## Getting started
 
-1.  make sure you have an azure account
-    a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that. This means that we have to keep 
+1.  Maake sure you have an azure account
+
+    a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that. This means that we have to keep track of your account name and auth keys. There are __two__ sets of auth keys that we'll need. One to authenticate Storage IO, to log on to the Azure portal, and another to authenticate deployment and HTTP PUTs.
+
 2. `pip install azure-storage`
-2. 
 
 ## Deployment
 Azure gives you two options to deploy a function: web portal or via HTTP Put.
