@@ -46,7 +46,7 @@ The following files need to be zipped and PUT to the endpoint `https:{function_n
 * `jobrunner.py` This runs in a subprocess to unpickle the function, and puts the output in storage.
 * `run.py` same as wrenhandler. `run.py` is what Azure runs when you trigger a function. 
 
-To deploy everything, run `pywrenazure/deploy.py` with your `storage_account_name`, `storage_account_key`, and `function_name` stored in the variables
+To deploy everything, run `pywrenazure/deploy.py` with your `storage_account_name`, `storage_account_key`, and `function_name` stored in the variables `AZURE_STORAGE_ACC_NAME`, `AZURE_STORAGE_KEY`, and `FUNCTION_NAME`
 
 ### Runtimes
 We can deploy a runtime directly to the function container using Azure's Kudu service. This gives us a few advantages
