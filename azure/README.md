@@ -33,6 +33,9 @@ There are a few steps involved in deploying a function.
 * Location -> West US
 * Storage account -> choose an existing `storage_account`
 
+On your function app page, click on `Download publish profile`. This downloads an XML file with some metadata that is used to connect the function app with other services. Note the variables `userName` (this starts with a `$`) and `userPWD`. are the KUDU username and KUDU password that we'll use to deploy our code.
+
+
 ### Deploying the function code
 Azure gives you two options to deploy a function: web portal or via HTTP Put.
 
