@@ -5,20 +5,20 @@
       "type": "queueTrigger",
       "direction": "in",
       "queueName": "samples-python",
-      "connection": "AzureWebJobsDashboard"
+      "connection": "AzureWebJobsStorage"
     },
     {
       "type": "blob",
       "name": "statusfile",
       "path": "pywren1/{status_key}",
-      "connection": "AzureWebJobsDashboard",
+      "connection": "AzureWebJobsStorage",
       "direction": "out"
     },
     {
       "type": "blob",
       "name": "outputfile",
       "path": "pywren1/{output_key}",
-      "connection": "AzureWebJobsDashboard",
+      "connection": "AzureWebJobsStorage",
       "direction": "out"
     },
     {

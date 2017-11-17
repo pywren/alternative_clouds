@@ -13,7 +13,7 @@ condaruntime_binary = BlockBlobService(
     )
 
 #deploy.
-FUNCTION_NAME = {}
+FUNCTION_NAME = ""
 BASEURL = "https://{}.scm.azurewebsites.net".format(FUNCTION_NAME)
 
 PUT_URL = BASEURL + "api/zip/site/wwwroot/conda"

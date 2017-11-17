@@ -8,9 +8,32 @@
 
     a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that. This means that we have to keep track of your account name and auth keys. There are __two__ sets of auth keys that we'll need. One to authenticate Storage IO, to log on to the Azure portal, and another to authenticate deployment and HTTP PUTs.
 
-2. `pip install azure-storage`
+2. Create a storage account and note your access key.
+    a. In the azure portal, click `New` on the left side, and search `storage`. Click on `Storage account` and create a new account.
+        i. Note the storage account name
+        ii. Navigate to the storage account page and and click on `Access Keys`. Note the primary `access_key`.
+
+3. `pip install azure-storage`
 
 ## Deployment
+There are a few steps involved in deploying a function. 
+
+1. Registering a function app on Azure.
+
+2. Deploying the function code
+
+3. Setting up runtimes
+
+### Registering function app
+* Go to the Azure portal. Select `New`(on the left bar) and Search + create a new Function App. 
+* Enter in a `function_name`
+* Subscription -> Pay-as-you-go
+* OS -> Windows
+* Hosting Plan -> Consumption
+* Location -> West US
+* Storage account -> choose an existing `storage_account`
+
+### Deploying the function code
 Azure gives you two options to deploy a function: web portal or via HTTP Put.
 
 I think using HTTP PUT is better for the following reasons.
@@ -23,7 +46,7 @@ The following files need to be zipped and PUT to the endpoint `https:{function_n
 * `jobrunner.py` This runs in a subprocess to unpickle the function, and puts the output in storage.
 * `run.py` same as wrenhandler. `run.py` is what Azure runs when you trigger a function. 
 
-To deploy everything, simply run `pywrenazure/deploy.py`
+To deploy everything, run `pywrenazure/deploy.py` with your `storage_account_name`, `storage_account_key`, and `function_name` stored in the variables
 
 ### Runtimes
 We can deploy a runtime directly to the function container using Azure's Kudu service. This gives us a few advantages
@@ -32,11 +55,11 @@ We can deploy a runtime directly to the function container using Azure's Kudu se
 * Because Azure doesn't have isolation between concurrent containers, sticking a runtime into persistent storage means we don't have to deal with any race conditions or coordination between threads trying to write the same binary to the same location.
 
 To deploy a runtime, we need a few steps:
-1. **Get a runtime **
+1. Get a runtime
 
     a. Azure Functions containers run Windows Server 2012, so we'd need to create the runtime on a VM running Windows. Unfortunately, you can't SSH onto a windows VM without installing and running cygwin first. The only way to access a windows VM is through Remote Desktop Protocol.
 
-        i. Linux containers are planned to come out in the future though.
+        i. Linux containers are planned to come out in the future though. ** As of November 2017, I Linux Containers are available **
 
     b. I have a `python 2.7` runtime publicly available in a storage bucket that we can pull from. I made this manually, RDPing onto a machine, setting up conda, and installing packages. This is the only way to make a runtime right now.
 
@@ -83,7 +106,7 @@ Here's how storage accesses work in Azure:
       "type": "blob",                      //Read from blob storage
       "name": "outputfile",                //The filename will be availble at os.environ['outputfile']
       "path": "azure-webjobs-hosts/foo/{output_key}", //Specify the path of the file in the cloud storage bucket.
-      "connection": "AzureWebJobsDashboard",    //Name of the blob storage bucket.
+      "connection": "AzureWebJobsStorage",
       "direction": "out"                     //This is an output binding/write
     },
 ```
