@@ -4,14 +4,21 @@
 
 ## Getting started
 
-1.  Maake sure you have an azure account
+1.  Make sure you have an azure account
 
     a. Note that unlike gcloud and AWS, [Azure hasn't figured out how to detect credentials automatically from your local environment](https://github.com/Azure/azure-sdk-for-python/issues/1310), so there's no need to bother with that. This means that we have to keep track of your account name and auth keys. There are __two__ sets of auth keys that we'll need. One to authenticate Storage IO, to log on to the Azure portal, and another to authenticate deployment and HTTP PUTs.
 
 2. Create a storage account and note your access key.
-    a. In the azure portal, click `New` on the left side, and search `storage`. Click on `Storage account` and create a new account.
-        i. Note the storage account name
-        ii. Navigate to the storage account page and and click on `Access Keys`. Note the primary `access_key`.
+
+![creating a new storage account](https://raw.githubusercontent.com/pywren/alternative_clouds/master/images/new_storage.png)
+
+a. In the azure portal, click `New` on the left side, and search `storage`. Click on `Storage account` and create a new account.
+     i. Note the storage account name
+     ii. Navigate to the storage account page and and click on `Access Keys`. Note the primary `access_key`.
+
+
+![access key](https://raw.githubusercontent.com/pywren/alternative_clouds/master/images/accesskey.png)
+
 
 3. `pip install azure-storage`
 
@@ -34,6 +41,7 @@ There are a few steps involved in deploying a function.
 * Storage account -> choose an existing `storage_account`
 
 On your function app page, click on `Download publish profile`. This downloads an XML file with some metadata that is used to connect the function app with other services. Note the variables `userName` (this starts with a `$`) and `userPWD`. are the KUDU username and KUDU password that we'll use to deploy our code.
+![Finding KUDU auth](https://raw.githubusercontent.com/pywren/alternative_clouds/master/images/kudu_login.png)
 
 
 ### Deploying the function code

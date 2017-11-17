@@ -135,9 +135,7 @@ def generic_handler(event, context_dict):
         logger.info("Finished writing {} module files".format(len(d['module_data'])))
 
         cwd = os.getcwd()
-        # I deployed jobrunner.py as a separate function. This isn't necessary because
-        # you can just deploy jobrunner as a local file with your deployment zip.
-        jobrunner_path = "D:\\home\\site\\wwwroot\\jobrunner\\run.py"
+        jobrunner_path = "jobrunner.py"
 
         extra_env = event.get('extra_env', {})
         extra_env['PYTHONPATH'] = "{};{}".format(os.getcwd(), PYTHON_MODULE_PATH)
@@ -147,6 +145,7 @@ def generic_handler(event, context_dict):
         response_status['call_id'] = call_id
         response_status['callset_id'] = callset_id
 
+      
         CONDA_PYTHON_PATH = "D:\home\site\wwwroot\conda\Miniconda2"
         CONDA_PYTHON_RUNTIME = os.path.join(CONDA_PYTHON_PATH, "python")
 
