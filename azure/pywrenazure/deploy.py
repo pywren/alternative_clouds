@@ -1,3 +1,6 @@
+# This is the script to deploy the function to the Azure.
+
+
 from requests import put
 import os
 import io
@@ -7,9 +10,12 @@ from azure.storage.blob import BlockBlobService
 
 
 FUNCTION_NAME = ""
+
+# Azure storage account name and primary key. See the README.
 AZURE_STORAGE_ACC_NAME = ""
 AZURE_STORAGE_KEY = ""
 
+#publish credentials
 KUDU_USER = ""
 KUDU_PASS = ""
 

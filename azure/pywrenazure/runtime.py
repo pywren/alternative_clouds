@@ -1,7 +1,17 @@
+#this is code to fetch the runtime from azure storage and then deploy it to the azure functions VM.
+
 from azure.storage.blob import BlockBlobService
 import os
 from requests import put
 import zipfile
+
+
+#function name. See README
+FUNCTION_NAME = ""
+
+#publish crednetials. See README
+KUDU_USER= ""
+KUDU_PASS = ""
 
 # Fetch runtime
 condaruntime_binary = BlockBlobService(
@@ -13,13 +23,10 @@ condaruntime_binary = BlockBlobService(
     )
 
 #deploy.
-FUNCTION_NAME = ""
 BASEURL = "https://{}.scm.azurewebsites.net".format(FUNCTION_NAME)
 
 PUT_URL = BASEURL + "api/zip/site/wwwroot/conda"
 
-KUDU_USER= ""
-KUDU_PASS = ""
 
 file_like_object = io.BytesIO()
 zipfile_obj = zipfile.ZipFile(file_like_object, mode='w')
