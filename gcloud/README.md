@@ -35,6 +35,7 @@ A google cloud function is deployed as a node module. Set up a directory for eve
 mkdir pywren_gcf
 mv package.json pywren_gcf
 mv index.js pywren_gcf
+mv jobrunner.py pywren_gcf
 cd pywren_gcf
 ```
 
@@ -79,5 +80,4 @@ res = post(URL, headers=HEADERS, json = payload)
 
 ## Storage
 The code in `storage/gcs_service.py` has the same API as `storage/s3_backend.py`
-
 
