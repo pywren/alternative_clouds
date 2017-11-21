@@ -1,0 +1,22 @@
+storage_backend: google
+
+runtime:
+    runtime_storage: google
+    google_bucket : allanpywrentest
+    google_key : condaruntime.tar.gz
+
+google_account:
+    region: us-central1
+    project: <project_name>
+
+google_storage:
+    bucket : <bucket_name>
+    project: <project_name>
+    pywren_prefix: pywren.jobs
+
+google_function:
+    memory : 2048
+    timeout : 300
+    function_name : handler
+    project: <project_name>
+

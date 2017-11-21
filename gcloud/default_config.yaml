@@ -1,0 +1,28 @@
+account:
+    aws_account_id: AWS_ACCOUNT_ID
+    aws_lambda_role: pywren_exec_role
+    aws_region: AWS_REGION
+
+lambda:
+    memory : 1536
+    timeout : 300
+    function_name : pywren1
+    
+s3:
+    bucket: BUCKET_NAME
+    pywren_prefix: pywren.jobs
+
+runtime:
+    s3_bucket: ericmjonas-public
+    s3_key: RUNTIME_KEY
+
+standalone:
+    ec2_instance_type: m4.4xlarge
+    sqs_queue_name: pywren-queue
+    visibility: 10
+    ec2_ssh_key : ec2-us-west-2
+    target_ami : ami-b04e92d0
+    instance_name: pywren-standalone
+    instance_profile_name: pywren-standalone
+    max_idle_time: 60
+    idle_terminate_granularity: 3600
