@@ -133,6 +133,22 @@ with open(os.environ[outputfile], 'wb') as f:
 
 Technically, we _could_ support random storage IO if we update the conda runtime to have the Azure SDK. However, my understanding is that the Azure python SDK isn't very mature. For example, they have no mechanism to detect auth credentials from your environment the way Google and AWS do. Thus, users would have to upload their auth credentialswithin the data pickle in order to achieve random IO.
 
-## Function.json
-This is the config file. 
+## Update `pywren_config`
+Following `sample_config.yaml`, add the following section
+
+```
+az:
+	container: <container name>
+	pywren_prefix: pywren.jobs
+	queue_name: <queue name>
+	account_name: azure_storage_account_name
+	access_key: azure_storage_access_key
+
+runtime:
+	runtime_storage: az
+	az_name: foo
+	az_key: bar 
+	az_container: baz
+	az_blob_name: pywren.runtime/pywren_runtime-2.7-default.tar.gz
+
 
